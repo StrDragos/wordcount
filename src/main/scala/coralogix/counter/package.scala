@@ -12,21 +12,24 @@ import io.circe.parser
 package object counter {
   type Words = Map[String, Int]
   type Types = String
+  type StreamOp[R, T] = ZStream[R, Throwable, T]
 
-  private[counter] def read(): ZStream[Blocking, Throwable, String] =
+  final case class Line(value: String)
+
+  private[counter] def read(): StreamOp[Blocking, String] =
     Command("src/main/resources/blackbox.macosx")
       .linesStream
 
-  private[counter] def split(stream: ZStream[Blocking, Throwable, String]): ZStream[Blocking, Throwable, List[String]] =
+  private[counter] def split[R](stream: StreamOp[R, String]): StreamOp[R, List[String]] =
     stream.map(_.split('\n').toList)
 
-  private[counter] def flatten(stream: ZStream[Blocking, Throwable, List[String]]): ZStream[Blocking, Throwable, String] =
-    stream.flatMap(l => ZStream.fromIterator(l.iterator))
+  private[counter] def flatten[R](stream: StreamOp[R, List[String]]): StreamOp[R, Line] =
+    stream.flatMap(l => ZStream.fromIterator(l.iterator.map(Line)))
 
-  private[counter] def deserialize(stream: ZStream[Blocking, Throwable, String]): ZStream[Blocking with Console, Throwable, Event] = {
+  private[counter] def deserialize[R](stream: StreamOp[R, Line]): ZStream[R with Console, Throwable, Event] = {
     for {
       in <- stream
-      deserialized = parser.decode[Event](in)
+      deserialized = parser.decode[Event](in.value)
       eff = deserialized.fold(
         err => putStrLn(s"Failed to deserialize message $in, err ${err}") *> ZIO.none,
         v => ZIO.some(v)
