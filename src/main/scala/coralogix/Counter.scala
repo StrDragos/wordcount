@@ -1,0 +1,6 @@
+package coralogix
+
+object Counter {
+
+
+}
