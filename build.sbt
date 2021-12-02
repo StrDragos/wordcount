@@ -7,6 +7,8 @@ val zioVersion = "1.0.12"
 val zioProcessVersion = "0.5.0"
 val circeVersion = "0.14.1"
 val zhttp = "1.0.0.0-RC17"
+val zioPrelude = "1.0.0-RC8"
+val catsVersion = "2.6.1"
 
 lazy val root = (project in file("."))
   .settings(
@@ -20,7 +22,10 @@ lazy val root = (project in file("."))
       "io.circe" %% "circe-parser" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-generic-extras" % circeVersion,
-      "dev.zio" %% "zio-test-sbt" % zioVersion
+      "dev.zio" %% "zio-test-sbt" % zioVersion,
+      "dev.zio" %% "zio-prelude" % zioPrelude,
+      "org.typelevel" %% "cats-core" % catsVersion
+
     ),
     scalacOptions ++= Seq(
       "-Ymacro-annotations"

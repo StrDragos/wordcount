@@ -3,17 +3,14 @@ package coralogix
 import zio._
 import zio.console._
 
+import zhttp.service.Server
+
 object Main extends zio.App {
+
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] = {
-      Counter.read()
-        .via(Counter.split)
-        .via(Counter.flatten)
-        .via(Counter.deserialize)
-        .tap(r => putStrLn(s"Result received ${r}"))
-        .runDrain
-        .exitCode
+    (for {
+      _ <- putStrLn("Server started")
+      s <-  Server.start(8080, http.counterRoute)
+     } yield s).exitCode
   }
-  //        .tap(s => putStrLn(s))
-//        .runDrain
-//        .exitCode
 }
