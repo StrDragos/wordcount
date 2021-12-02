@@ -6,10 +6,13 @@ import zio.console.{Console, putStrLn}
 import zio.process.Command
 import zio.stream.ZStream
 
-import coralogix.models.Event
+import coralogix.counter.models.Event
 import io.circe.parser
 
 package object counter {
+  type Words = Map[String, Int]
+  type Types = String
+
   private[counter] def read(): ZStream[Blocking, Throwable, String] =
     Command("src/main/resources/blackbox.macosx")
       .linesStream
@@ -31,4 +34,17 @@ package object counter {
       out <- ZStream.fromEffect(eff).filter(_.isDefined).map(_.get)
     } yield out
   }
+
+  def groupEvents(events: List[Event]) =
+    events.groupBy(_.eventType)
+
+  def countWords(events: List[Event]) =
+    events.groupBy(_.data).map{
+      case d -> e => (d, e.size)
+    }
+
+  def processEvents(events: List[Event]) =
+    groupEvents(events).map{
+      case k -> e => (k, countWords(e))
+    }
 }

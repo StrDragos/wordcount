@@ -7,7 +7,7 @@ import zio.test.Assertion.equalTo
 import zio.test._
 import zio.{Chunk, ZIO}
 
-import coralogix.models.Event
+import models.Event
 
 object CounterSpec extends DefaultRunnableSpec {
   val rawInput = """{ "event_type": "baz", "data": "amet", "timestamp": 1638457033 }
