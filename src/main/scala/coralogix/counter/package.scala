@@ -2,7 +2,7 @@ package coralogix
 
 import zio.ZIO
 import zio.blocking.Blocking
-import zio.console.{Console, putStrLn}
+import zio.console.putStrLn
 import zio.process.Command
 import zio.stream.ZStream
 
@@ -12,22 +12,20 @@ import io.circe.parser
 package object counter {
   type Words = Map[String, Int]
   type Types = String
-  type StreamOp[R, T] = ZStream[R, Throwable, T]
 
   final case class Line(value: String)
 
-  private[counter] def read(): StreamOp[Blocking, String] =
+  private[counter] def read() =
     Command("src/main/resources/blackbox.macosx")
       .linesStream
 
-  private[counter] def split[R](stream: StreamOp[R, String]): StreamOp[R, List[String]] =
+  private[counter] def split[R](stream: ZStream[Blocking, Throwable, String]) =
     stream.map(_.split('\n').toList)
 
-  private[counter] def flatten[R](stream: StreamOp[R, List[String]]): StreamOp[R, Line] =
+  private[counter] def flatten[R](stream: ZStream[Blocking, Throwable, List[String]]) =
     stream.flatMap(l => ZStream.fromIterator(l.iterator.map(Line)))
 
-  private[counter] def deserialize[R](stream: StreamOp[R, Line]): ZStream[R with Console, Throwable, Event] = {
-    for {
+  private[counter] def deserialize[R](stream: ZStream[Blocking, Throwable, Line]) = for {
       in <- stream
       deserialized = parser.decode[Event](in.value)
       eff = deserialized.fold(
@@ -36,7 +34,6 @@ package object counter {
       )
       out <- ZStream.fromEffect(eff).filter(_.isDefined).map(_.get)
     } yield out
-  }
 
   def groupEvents(events: List[Event]) =
     events.groupBy(_.eventType)

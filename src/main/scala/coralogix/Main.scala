@@ -3,6 +3,7 @@ package coralogix
 import zio._
 import zio.console._
 
+import coralogix.counter.Counter
 import zhttp.service.Server
 
 object Main extends zio.App {
@@ -12,5 +13,5 @@ object Main extends zio.App {
       _ <- putStrLn("Server started")
       s <-  Server.start(8080, http.counterRoute)
      } yield s).exitCode
-  }
+  }.provideLayer(ZEnv.live ++ Counter.layer)
 }

@@ -1,15 +1,22 @@
 package coralogix.counter
 
-import zio.Schedule
+import zio._
+import zio.console.Console
+import zio.blocking.Blocking
+import zio.clock.Clock
 import zio.duration._
-import zio.stream.ZTransducer
+import zio.stream._
+
 import cats.implicits._
 
-import models.Event
+import coralogix.counter.models.Event
 
-object Counter {
+trait Counter {
+  def start(): ZStream[Any, Throwable, Map[Types, Words]]
+}
 
-  def start =
+private case class CounterLive (blocking: Blocking.Service, console: Console.Service, clock: Clock.Service) extends Counter {
+  override def start() = {
     read()
       .via(split)
       .via(flatten)
@@ -20,4 +27,12 @@ object Counter {
       ).scan(Map.empty[Types, Words])(
       (s, events) => processEvents(events).combine(s)
     )
+  }.provideLayer(ZLayer.succeed(blocking) ++ ZLayer.succeed(console) ++ ZLayer.succeed(clock))
+}
+
+object Counter {
+  val layer: URLayer[Has[Blocking.Service] with Has[Console.Service] with Has[Clock.Service], Has[Counter]] =
+    (CounterLive(_, _, _)).toLayer
+
+  def start() = ZStream.serviceWithStream[Counter](_.start())
 }

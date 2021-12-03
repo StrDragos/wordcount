@@ -30,7 +30,7 @@ object CounterSpec extends DefaultRunnableSpec {
         .provideLayer(Blocking.live)
     },
     testM("should not fail when invalid data is received"){
-      val inStream = ZStream.fromIterable(listOfMsgs)
+      val inStream = ZStream.fromIterable(listOfMsgs.map(Line))
       val expected = Event(eventType = "baz", data = "amet", timestamp = 1638457033)
 
       assertM(deserialize(inStream).runCollect)(equalTo(Chunk(expected)))

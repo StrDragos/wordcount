@@ -10,7 +10,7 @@ object http {
   val counterRoute = HttpApp.collect{
     case Method.GET -> Root / "count" =>
       val stream = for {
-        counts <- Counter.start.map(v => v.asJson.toString().getBytes(HTTP_CHARSET))
+        counts <- Counter.start().map(v => v.asJson.toString().getBytes(HTTP_CHARSET))
         out <- ZStream.fromIterable(counts)
       } yield out
 
