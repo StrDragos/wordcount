@@ -42,12 +42,12 @@ package object counter {
     events.groupBy(_.eventType)
 
   def countWords(events: List[Event]) =
-    events.groupBy(_.data).map{
-      case d -> e => (d, e.size)
-    }
+    valueMap(events.groupBy(_.data))(e => e.size)
 
   def processEvents(events: List[Event]) =
-    groupEvents(events).map{
-      case k -> e => (k, countWords(e))
+    valueMap(groupEvents(events))(countWords)
+
+  def valueMap[K, V, B](value: Map[K, V])(f: V =>  B) = value.map{
+      case k -> v =>  (k, f(v))
     }
 }
