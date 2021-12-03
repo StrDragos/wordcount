@@ -1,9 +1,9 @@
-package coralogix
+package dragos
 
 import zio._
 import zio.console._
 
-import coralogix.counter.Counter
+import dragos.counter.Counter
 import zhttp.service.Server
 
 object Main extends zio.App {

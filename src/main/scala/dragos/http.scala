@@ -1,8 +1,8 @@
-package coralogix
+package dragos
 
 import zio.stream.ZStream
 
-import coralogix.counter.Counter
+import dragos.counter.Counter
 import zhttp.http._
 import io.circe.syntax._
 

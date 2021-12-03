@@ -1,4 +1,4 @@
-package coralogix
+package dragos
 
 import zio.ZIO
 import zio.blocking.Blocking
@@ -6,7 +6,7 @@ import zio.console.putStrLn
 import zio.process.Command
 import zio.stream.ZStream
 
-import coralogix.counter.models.Event
+import dragos.counter.models.Event
 import io.circe.parser
 
 package object counter {

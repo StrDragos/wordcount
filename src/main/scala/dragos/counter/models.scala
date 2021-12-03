@@ -1,4 +1,4 @@
-package coralogix.counter
+package dragos.counter
 
 import io.circe.generic.extras._
 

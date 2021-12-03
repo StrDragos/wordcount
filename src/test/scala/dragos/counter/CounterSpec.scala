@@ -1,4 +1,4 @@
-package coralogix.counter
+package dragos.counter
 
 import zio.blocking.Blocking
 import zio.console.Console

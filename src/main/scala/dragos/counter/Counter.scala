@@ -1,4 +1,4 @@
-package coralogix.counter
+package dragos.counter
 
 import zio._
 import zio.console.Console
@@ -9,7 +9,7 @@ import zio.stream._
 
 import cats.implicits._
 
-import coralogix.counter.models.Event
+import dragos.counter.models.Event
 
 trait Counter {
   def start(): ZStream[Any, Throwable, Map[Types, Words]]
